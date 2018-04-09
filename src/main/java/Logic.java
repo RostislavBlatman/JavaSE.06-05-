@@ -1,9 +1,11 @@
 package main.java;
 
-import main.java.exceptions.NullException;
+import main.java.exceptions.BadPathToPackageWithProperties;
+import main.java.exceptions.KeyOrValueIsNullException;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -11,29 +13,49 @@ import java.util.stream.Collectors;
 
 public class Logic {
 
+    private static Logic instance;
     private Map<String, String> mapForProperties;
-    private String pathToPackage;
 
-    public Logic(String pathToPackage) {
-        mapForProperties = new HashMap<>();
-        this.pathToPackage = pathToPackage;
+    private int indexStartFileName;
+    private int indexEndFileName;
 
+    private Logic() {
     }
 
-    public void mainFunction() {
+    public static Logic getInstance() {
+        if (instance == null) {
+            instance = new Logic();
+        }
+        return instance;
+    }
 
+    public void init(String pathToPackage) {
+        mapForProperties = new HashMap<>();
         try {
             List<Path> paths = Files.walk(Paths.get(pathToPackage))
                     .filter(Files::isRegularFile)
                     .collect(Collectors.toList());
             for (Path path : paths) {
 
-                int a = path.getFileName().toString().lastIndexOf("\\") + 1;
-                int b = path.getFileName().toString().lastIndexOf(".");
+                indexStartFileName = path.getFileName().toString().lastIndexOf("\\") + 1;
+                indexEndFileName = path.getFileName().toString().lastIndexOf(".");
 
-                putPropertiesInMap(path.getFileName().toString().substring(a, b));
+                if (path.getFileName().toString().contains(".properties")) {
+
+                    putPropertiesInMap(path.getFileName().toString().substring(indexStartFileName, indexEndFileName));
+                } else {
+                    throw new BadPathToPackageWithProperties();
+                }
 
             }
+
+        } catch (BadPathToPackageWithProperties badPathToPackageWithProperties) {
+
+            badPathToPackageWithProperties.printStackTrace();
+
+        } catch (NoSuchFileException noSuchFileException) {
+            System.out.println("You have entered a non-existent way or this package is empty");
+            noSuchFileException.printStackTrace();
 
         } catch (IOException exception) {
             exception.printStackTrace();
@@ -43,6 +65,7 @@ public class Logic {
     }
 
     private void putPropertiesInMap(String path) {
+
         try {
             ResourceBundle rb = ResourceBundle.getBundle(path);
 
@@ -52,9 +75,7 @@ public class Logic {
                 String value = rb.getString(key);
                 mapForProperties.put(key, value);
             }
-        } catch (MissingResourceException missingResource) {
-            System.out.println("Please, input good path to package");
-            throw missingResource;
+
         } catch (NullPointerException nullPointerException) {
             System.out.println("Please, input path");
             throw nullPointerException;
@@ -65,9 +86,9 @@ public class Logic {
         return mapForProperties;
     }
 
-    public String getValueForKey(String key) throws NullException {
+    public String getValueForKey(String key) throws KeyOrValueIsNullException {
         if (key == null || mapForProperties.get(key) == null) {
-            throw new NullException();
+            throw new KeyOrValueIsNullException();
         } else {
             return mapForProperties.get(key);
         }

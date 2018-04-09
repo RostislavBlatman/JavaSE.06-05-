@@ -1,11 +1,11 @@
 package main.java.exceptions;
 
-public class NullException extends Exception {
-    public NullException() {
+public class KeyOrValueIsNullException extends Exception {
+    public KeyOrValueIsNullException() {
         super("Please,input good key");
     }
 
-    public NullException(String message) {
+    public KeyOrValueIsNullException(String message) {
         super(message);
     }
 }

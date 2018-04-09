@@ -1,7 +1,7 @@
 package test.java;
 
 import main.java.Logic;
-import main.java.exceptions.NullException;
+import main.java.exceptions.KeyOrValueIsNullException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,23 +15,23 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class TestForLogic {
-
     Logic logic;
     final static String PATH_FOR_OUTPUT_FILE = "C:\\Users\\Ростислав\\Desktop\\Homework\\JavaSE.06.new\\src" +
             "\\test\\java\\testResources\\testForWriteInFile.properties";
+    final static String PATH_FOR_INPUT_FILE = "C:\\Users\\Ростислав\\Desktop\\Homework\\JavaSE.06.new\\src\\test\\java\\" +
+            "testResources\\testProperty.properties";
 
 
     @BeforeEach
     void setUp() {
-        logic = new Logic("C:\\Users\\Ростислав\\Desktop\\Homework\\JavaSE.06.new\\src\\test\\java\\" +
-                "testResources\\testProperty.properties");
+        logic = Logic.getInstance();
     }
 
     @DisplayName("Test for mainFunction")
     @Test
-    void testForMainFunction() {
+    void testForInit() {
 
-        logic.mainFunction();
+        logic.init(PATH_FOR_INPUT_FILE);
         assertEquals(logic.getMapForProperties().toString(), "{1=qwerty, qwerty=1}");
 
     }
@@ -40,12 +40,12 @@ public class TestForLogic {
     @Test
     void testForGetValue() {
 
-        logic.mainFunction();
+        logic.init(PATH_FOR_INPUT_FILE);
         try {
             assertEquals(logic.getValueForKey("1"), "qwerty");
-            assertThrows(NullException.class, () -> logic.getValueForKey("11"));
-            assertThrows(NullException.class, () -> logic.getValueForKey(null));
-        } catch (NullException exception) {
+            assertThrows(KeyOrValueIsNullException.class, () -> logic.getValueForKey("11"));
+            assertThrows(KeyOrValueIsNullException.class, () -> logic.getValueForKey(null));
+        } catch (KeyOrValueIsNullException exception) {
             exception.printStackTrace();
         }
     }
@@ -54,7 +54,7 @@ public class TestForLogic {
     @Test
     void testWriteInFile() {
 
-        logic.mainFunction();
+        logic.init(PATH_FOR_INPUT_FILE);
         logic.writeInFile(PATH_FOR_OUTPUT_FILE);
         try (BufferedReader bufferedReader = new BufferedReader(
                 new InputStreamReader(new FileInputStream(PATH_FOR_OUTPUT_FILE)))) {
