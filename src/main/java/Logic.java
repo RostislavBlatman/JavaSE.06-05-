@@ -16,20 +16,18 @@ public class Logic {
     private static Logic instance;
     private Map<String, String> mapForProperties;
 
-    private int indexStartFileName;
-    private int indexEndFileName;
-
-    private Logic() {
+    private Logic(String pathToPackage) {
+        init(pathToPackage);
     }
 
-    public static Logic getInstance() {
+    public static Logic getInstance(String pathToPackage) {
         if (instance == null) {
-            instance = new Logic();
+            instance = new Logic(pathToPackage);
         }
         return instance;
     }
 
-    public void init(String pathToPackage) {
+    private void init(String pathToPackage) {
         mapForProperties = new HashMap<>();
         try {
             List<Path> paths = Files.walk(Paths.get(pathToPackage))
@@ -37,8 +35,8 @@ public class Logic {
                     .collect(Collectors.toList());
             for (Path path : paths) {
 
-                indexStartFileName = path.getFileName().toString().lastIndexOf("\\") + 1;
-                indexEndFileName = path.getFileName().toString().lastIndexOf(".");
+                int indexStartFileName = path.getFileName().toString().lastIndexOf("\\") + 1;
+                int indexEndFileName = path.getFileName().toString().lastIndexOf(".");
 
                 if (path.getFileName().toString().contains(".properties")) {
 

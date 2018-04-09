@@ -24,14 +24,14 @@ public class TestForLogic {
 
     @BeforeEach
     void setUp() {
-        logic = Logic.getInstance();
+        logic = Logic.getInstance(PATH_FOR_INPUT_FILE);
     }
 
     @DisplayName("Test for mainFunction")
     @Test
     void testForInit() {
 
-        logic.init(PATH_FOR_INPUT_FILE);
+
         assertEquals(logic.getMapForProperties().toString(), "{1=qwerty, qwerty=1}");
 
     }
@@ -40,7 +40,7 @@ public class TestForLogic {
     @Test
     void testForGetValue() {
 
-        logic.init(PATH_FOR_INPUT_FILE);
+
         try {
             assertEquals(logic.getValueForKey("1"), "qwerty");
             assertThrows(KeyOrValueIsNullException.class, () -> logic.getValueForKey("11"));
@@ -54,7 +54,7 @@ public class TestForLogic {
     @Test
     void testWriteInFile() {
 
-        logic.init(PATH_FOR_INPUT_FILE);
+
         logic.writeInFile(PATH_FOR_OUTPUT_FILE);
         try (BufferedReader bufferedReader = new BufferedReader(
                 new InputStreamReader(new FileInputStream(PATH_FOR_OUTPUT_FILE)))) {
